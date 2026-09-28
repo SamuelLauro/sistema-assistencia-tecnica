@@ -1,1 +1,8 @@
 /target/
+.idea/
+*.iml
+.vscode/
+nbproject/private/
+
+# credenciais locais do banco (use db.properties.exemplo como modelo)
+db.properties

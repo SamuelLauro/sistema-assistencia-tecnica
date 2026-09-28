@@ -1,0 +1,5 @@
+# Copie este arquivo para db.properties (ele fica fora do Git) e preencha com o seu acesso.
+# Variáveis de ambiente DB_URL, DB_USER e DB_PASSWORD têm prioridade sobre este arquivo.
+db.url=jdbc:mysql://localhost:3306/dbinfox
+db.user=seu_usuario
+db.password=sua_senha

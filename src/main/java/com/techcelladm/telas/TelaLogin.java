@@ -4,9 +4,9 @@
  */
 package com.techcelladm.telas;
 
-import com.techcelladm.dal.ConexaoDAO;
-import java.sql.Connection;
+import com.techcelladm.dal.UsuarioDAO;
 import java.sql.SQLException;
+import java.util.Arrays;
 
 
 
@@ -118,19 +118,22 @@ public class TelaLogin extends javax.swing.JFrame {
     }//GEN-LAST:event_jPasswordField1ActionPerformed
 
     private void btnLoginActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLoginActionPerformed
-    String usuario = jTextField1.getText();
-    String senha = new String(jPasswordField1.getPassword());
+    String usuario = jTextField1.getText().trim();
+    char[] senha = jPasswordField1.getPassword();
 
-    // Aqui simulamos um usuário e senha válidos
-    String usuarioValido = "admin";
-    String senhaValida = "senha123";
-
-    if (usuario.equals(usuarioValido) && senha.equals(senhaValida)) {
-        this.dispose();
-        TelaPrincipal telaPrincipal = new TelaPrincipal();
-        telaPrincipal.setVisible(true);
-    } else {
-        lblStatus.setText("Usuário ou senha inválidos");
+    // Login e hash da senha ficam na tabela_usuarios (nada fixo no código)
+    try {
+        if (new UsuarioDAO().autenticar(usuario, senha)) {
+            this.dispose();
+            TelaPrincipal telaPrincipal = new TelaPrincipal();
+            telaPrincipal.setVisible(true);
+        } else {
+            lblStatus.setText("Usuário ou senha inválidos");
+        }
+    } catch (SQLException erro) {
+        lblStatus.setText("Não foi possível validar o login. Verifique o banco de dados.");
+    } finally {
+        Arrays.fill(senha, '\0');
     }
     }//GEN-LAST:event_btnLoginActionPerformed
 
