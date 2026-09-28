@@ -1,0 +1,45 @@
+name: build
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          # senha descartável do banco temporário do CI
+          MYSQL_ROOT_PASSWORD: ci-root
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping -h 127.0.0.1 -pci-root"
+          --health-interval=5s
+          --health-timeout=5s
+          --health-retries=20
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+          cache: maven
+
+      - name: Cria o banco a partir do schema.sql
+        run: mysql -h 127.0.0.1 -uroot -pci-root < "banco de dados/schema.sql"
+
+      - name: Compila e roda os testes (inclui login contra o MySQL)
+        env:
+          DB_URL: jdbc:mysql://127.0.0.1:3306/dbinfox?allowPublicKeyRetrieval=true&useSSL=false
+          DB_USER: root
+          DB_PASSWORD: ci-root
+        run: mvn -B test
+
+      - name: Gerador de hash de senha funciona
+        run: mvn -B -q exec:java -Dexec.mainClass=com.techcelladm.util.Senha -Dexec.args="teste" | grep -E '^pbkdf2_sha256\$600000\$'
